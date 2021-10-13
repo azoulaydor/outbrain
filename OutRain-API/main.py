@@ -10,7 +10,9 @@ api = Api(app)
 
 ## Main API
 api.add_resource(CheckCurrentWeather, '/v1/api/checkCurrentWeather')  # '/v1/api/checkCurrentWeather' is our entry point
-api.add_resource(CheckCityWeather, '/v1/api/checkCityWeather/<city_name>')  # '/v1/api/checkCityWeather' is our entry point
+#api.add_resource(CheckCityWeather, '/v1/api/checkCityWeather/<city_name>')  # '/v1/api/checkCityWeather' is our entry point
 api.add_resource(DriveStatus, '/v1/api/driveStatus')  # '/v1/api/driveStatus' is our entry point
-api.add_resource(DriveStatus, '/v1/api/driveStatus/<drive_status>')  # '/v1/api/driveStatus' is our entry point
+
+if __name__ == '__main__':
+    app.run(port=88)
 
