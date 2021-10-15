@@ -2,37 +2,45 @@
 from flask import request
 from flask_restful import Resource
 import json
-import requests
 import ipapi
 from pyowm import OWM
-from pyowm.utils import config
-from pyowm.utils import timestamps
+
 
 
 class CheckCurrentWeather(Resource):
 
     def get(self):
-        if 'current_city' in request.args:
-            current_city = request.args["current_city"]
-            city = current_city
-        else:
-            location_dict = ipapi.location()
-            city = location_dict["city"]
-            country = location_dict["country"]
-
+        location_dict = ipapi.location()
+        city = location_dict["city"]
+        country = location_dict["country"]
         owm = OWM('6613b8f7387ec9c7de8c0d1e107583a2')
         mgr = owm.weather_manager()
         observation = mgr.weather_at_place(city)
         weather = observation.weather
         temp = weather.temperature('celsius')["temp"]
         weather_dict = {"city": city, "country": country, "degrees": temp}
-
         return weather_dict
     pass
 
 
 class CheckCityWeather(Resource):
 
+    def get(self):
+        current_city = request.args.get('city_name')
+        strarr = list(current_city)
+        for i, c in enumerate(strarr):
+            if c == ' ':
+                strarr[i] = '%20'
+        city = "".join(strarr)
+        owm = OWM('6613b8f7387ec9c7de8c0d1e107583a2')
+        mgr = owm.weather_manager()
+        observation = mgr.weather_at_place(city)
+        weather = observation.weather
+        temp = weather.temperature('celsius')["temp"]
+        location = observation.to_dict()
+        country = location['location']['country']
+        weather_dict = {"city": city, "country": country, "degrees": temp}
+        return weather_dict
     pass
 
 
@@ -67,4 +75,11 @@ class DriveStatus(Resource):
                 return drives_offline_dict
         else:
             return drives_status_dict
+    pass
+
+    def post(self):
+        json_data = request.form #should be request.get_json() - not working
+        with open('container.json', 'w', encoding='utf-8') as f:
+            json.dump(json_data, f)
+        return json_data
     pass
